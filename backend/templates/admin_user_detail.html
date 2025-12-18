@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin – {{ target_user.username }}'s Finances</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-light bg-white border-bottom mb-4 px-4">
+    <a class="navbar-brand mb-0 h4" href="{{ url_for('admin_users') }}">
+        ← Back to Users
+    </a>
+    <div>
+        <span class="me-3">
+          Admin: <strong>{{ admin.username }}</strong>
+        </span>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">Logout</a>
+    </div>
+</nav>
+
+<div class="container mb-5">
+    <h3 class="mb-3">
+        {{ target_user.username }}'s Budgets &amp; Transactions
+        <small class="text-muted">(role: {{ target_user.role }})</small>
+    </h3>
+
+    <!-- SUMMARY CARDS -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Total Spent</h6>
+                    <h3 class="mb-0">£{{ "%.2f"|format(total_spent) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Budgets</h6>
+                    <h3 class="mb-0">{{ budgets|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Transactions</h6>
+                    <h3 class="mb-0">{{ transactions|length }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUDGET ALERTS -->
+    <div class="mb-4">
+        {% if alerts %}
+            <div class="alert alert-warning">
+                <h6 class="mb-2">Budget Alerts</h6>
+                <ul class="mb-0">
+                    {% for a in alerts %}
+                        <li>
+                            <strong>{{ a.category }}</strong>:
+                            spent £{{ "%.2f"|format(a.spent) }}
+                            vs limit £{{ "%.2f"|format(a.limit) }}
+                            (over by £{{ "%.2f"|format(a.difference) }}).
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="alert alert-success mb-0">
+                All budgets for this user are within limits.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- BUDGETS TABLE -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Budgets</h5>
+        </div>
+        <div class="card-body">
+            {% if budgets %}
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Limit</th>
+                        <th>Spent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for b in budgets %}
+                    {% set spent = category_totals.get(b.category, 0) %}
+                    <tr class="{% if spent > b.limit %}table-warning{% endif %}">
+                        <td>{{ b.id }}</td>
+                        <td>{{ b.category }}</td>
+                        <td>£{{ "%.2f"|format(b.limit) }}</td>
+                        <td>£{{ "%.2f"|format(spent) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="mb-0 text-muted">This user has no budgets.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS TABLE -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Transactions</h5>
+        </div>
+        <div class="card-body">
+            {% if transactions %}
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for t in transactions %}
+                    <tr>
+                        <td>{{ t.id }}</td>
+                        <td>{{ t.category }}</td>
+                        <td>£{{ "%.2f"|format(t.amount) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="mb-0 text-muted">This user has no transactions.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

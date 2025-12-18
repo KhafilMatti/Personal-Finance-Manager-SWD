@@ -1,0 +1,19 @@
+<h2>Archived Budgets</h2>
+
+{% if budgets %}
+  <ul>
+  {% for budget in budgets %}
+    <li>
+      {{ budget.category }} - £{{ "%.2f"|format(budget.limit_amount) }}
+
+      <form action="{{ url_for('unarchive_budget', budget_id=budget.id) }}" method="POST" style="display:inline;">
+        <button class="btn btn-success btn-sm">Unarchive</button>
+      </form>
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>No archived budgets.</p>
+{% endif %}
+
+<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
