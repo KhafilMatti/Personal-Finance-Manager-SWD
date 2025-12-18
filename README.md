@@ -76,7 +76,8 @@ Testing Process
 Contribution and References
 Flask: Python Web Framework
 SQLAlchemy: ORM database layer
-Werkzeug: Password hashing to
+Werkzeug: Password hashing tool
+
 
 
 
